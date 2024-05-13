@@ -1,0 +1,63 @@
+2024-05-13T08:28:28.381+02:00  WARN 11908 --- [hospital-management-system] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-05-13T08:28:30.061+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    create table admission_state (
+        id bigserial not null,
+        cause varchar(255),
+        discharge boolean,
+        entering_date timestamp(6),
+        exiting_date timestamp(6),
+        reason varchar(255),
+        department_id bigint,
+        patient_id bigint,
+        primary key (id)
+    )
+2024-05-13T08:28:30.088+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    create table clinical_data (
+        id bigserial not null,
+        clinical_record varchar(255),
+        admission_state_id bigint,
+        department_id bigint,
+        patient_id bigint,
+        primary key (id)
+    )
+2024-05-13T08:28:30.094+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    create table department (
+        id bigserial not null,
+        code varchar(255),
+        name varchar(255),
+        primary key (id)
+    )
+2024-05-13T08:28:30.103+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    create table patient (
+        id bigserial not null,
+        birth_date date,
+        first_name varchar(255),
+        last_name varchar(255),
+        primary key (id)
+    )
+2024-05-13T08:28:30.111+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    alter table if exists admission_state 
+       add constraint FKhemhhmfhiehx3to6v59v7klpe 
+       foreign key (department_id) 
+       references department
+2024-05-13T08:28:30.119+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    alter table if exists admission_state 
+       add constraint FKp42evjgvjbugwfe844j66runm 
+       foreign key (patient_id) 
+       references patient
+2024-05-13T08:28:30.122+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    alter table if exists clinical_data 
+       add constraint FKg49kla90iuye3vqep477h75p8 
+       foreign key (admission_state_id) 
+       references admission_state
+2024-05-13T08:28:30.125+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    alter table if exists clinical_data 
+       add constraint FK7s2o91swyvf8l3gse16mp4exl 
+       foreign key (department_id) 
+       references department
+2024-05-13T08:28:30.127+02:00 DEBUG 11908 --- [hospital-management-system] [main] org.hibernate.SQL                        : 
+    alter table if exists clinical_data 
+       add constraint FKqakg8k0lwjjrsrfrdd7n5snus 
+       foreign key (patient_id) 
+       references patient
+2024-05-13T08:28:30.182+02:00  WARN 11908 --- [hospital-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
