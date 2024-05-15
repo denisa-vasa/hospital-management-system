@@ -17,6 +17,9 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     @Autowired
     private DepartmentRepository departmentRepository;
 
+    public DepartmentManagementServiceImpl(DepartmentRepository departmentRepository) {
+        this.departmentRepository = departmentRepository;
+    }
 
     private Optional<Department> getByName(String name) {
         Department department = departmentRepository.findByName(name);
@@ -24,15 +27,18 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         return Optional.ofNullable(department);
     }
 
-
     @Override
     public Department saveDepartment(DepartmentDto departmentDto) {
         Optional<Department> optionalDepartment = getByName(departmentDto.getName());
-        Department savedepartment = optionalDepartment.orElse(new Department()); // create a new department if not found
+        Department existingDepartment = optionalDepartment.orElseGet(Department::new); // create a new department if not found
 
-        savedepartment.setName(departmentDto.getName());
-        savedepartment.setCode(departmentDto.getCode());
+        // Only set properties if it's a new department
+        if (optionalDepartment.isEmpty()) {
+            existingDepartment.setName(departmentDto.getName());
+            existingDepartment.setCode(departmentDto.getCode());
+            return departmentRepository.save(existingDepartment);
+        }
 
-        return departmentRepository.save(savedepartment);
+        return existingDepartment;
     }
 }
