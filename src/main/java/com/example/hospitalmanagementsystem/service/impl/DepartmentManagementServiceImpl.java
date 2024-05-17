@@ -1,6 +1,7 @@
 package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
+import com.example.hospitalmanagementsystem.dto.FilterDto;
 import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.repository.DepartmentRepository;
 import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,5 +43,16 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         }
 
         return existingDepartment;
+    }
+
+    @Override
+    public List<DepartmentDto> filterDepartment(String filter) {
+        return toListOfDepartmentDto(departmentRepository.filter(filter));
+    }
+
+    private List<DepartmentDto> toListOfDepartmentDto(List<Department> departmentList) {
+       List<DepartmentDto> dtos = new ArrayList<>();
+       departmentList.forEach(d -> dtos.add(new DepartmentDto(d)));
+       return dtos;
     }
 }
