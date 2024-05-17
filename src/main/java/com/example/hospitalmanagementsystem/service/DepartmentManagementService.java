@@ -11,4 +11,6 @@ public interface DepartmentManagementService {
     Department saveDepartment(DepartmentDto departmentDto);
 
     List<DepartmentDto> filterDepartment(String filter);
+
+    public void deleteDepartment(String name);
 }

@@ -14,4 +14,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Query("SELECT d FROM Department d WHERE d.name LIKE %?1%")
     public List<Department> filter(String filter);
+
+    public void deleteByName(String name);
 }
