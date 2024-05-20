@@ -2,6 +2,7 @@ package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
+import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.repository.DepartmentRepository;
 import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -37,7 +37,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
                 department.setName(departmentDto.getName());
                 department.setCode(departmentDto.getCode());
             } else {
-                throw new NoSuchElementException("Department not found with ID: " + departmentDto.getId());
+                throw new NotFoundException("Department not found with ID: " + departmentDto.getId());
             }
         } else {
             department = new Department();
@@ -66,6 +66,12 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     @Transactional
     public void deleteDepartment(String name) {
         departmentRepository.deleteByName(name);
+    }
+
+    @Override
+    public List<DepartmentDto> getAllDepartments() {
+        List<Department> departmentList = departmentRepository.findAll();
+        return toListOfDepartmentDto(departmentList);
     }
 
     private List<DepartmentDto> toListOfDepartmentDto(List<Department> departmentList) {

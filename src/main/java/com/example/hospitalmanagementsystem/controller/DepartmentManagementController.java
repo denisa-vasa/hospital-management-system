@@ -30,7 +30,13 @@ public class DepartmentManagementController {
     }
 
     @DeleteMapping("/deleteDepartment")
-    public void deleteDepartment(@RequestBody FilterDto filterDto) {
+    public String deleteDepartment(@RequestBody FilterDto filterDto) {
         departmentManagementService.deleteDepartment(filterDto.getName());
+        return "Department deleted successfully!";
+    }
+
+    @GetMapping("/getAllDepartments")
+    public List<DepartmentDto> getAllDepartments() {
+        return departmentManagementService.getAllDepartments();
     }
 }

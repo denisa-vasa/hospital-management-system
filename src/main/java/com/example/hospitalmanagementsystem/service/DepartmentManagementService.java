@@ -12,4 +12,6 @@ public interface DepartmentManagementService {
     List<DepartmentDto> filterDepartment(FilterDto filter);
 
     public void deleteDepartment(String name);
+
+    List<DepartmentDto> getAllDepartments();
 }
