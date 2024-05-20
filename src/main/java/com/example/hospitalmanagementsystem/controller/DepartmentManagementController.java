@@ -19,13 +19,14 @@ public class DepartmentManagementController {
     private DepartmentManagementService departmentManagementService;
 
     @PostMapping("/saveDepartment")
-    public void saveDepartment(@RequestBody DepartmentDto departmentDto) {
+    public String saveDepartment(@RequestBody DepartmentDto departmentDto) {
         departmentManagementService.saveDepartment(departmentDto);
+        return "Department saved or updated successfully!";
     }
 
     @GetMapping("/filterDepartment")
     public List<DepartmentDto> filterDepartment(@RequestBody FilterDto filter) {
-        return departmentManagementService.filterDepartment(filter.getName());
+        return departmentManagementService.filterDepartment(filter);
     }
 
     @DeleteMapping("/deleteDepartment")

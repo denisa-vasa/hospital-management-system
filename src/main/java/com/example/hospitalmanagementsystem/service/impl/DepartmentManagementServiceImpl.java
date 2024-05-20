@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -25,30 +26,40 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         this.departmentRepository = departmentRepository;
     }
 
-    private Optional<Department> getByName(String name) {
-        Department department = departmentRepository.findByName(name);
-
-        return Optional.ofNullable(department);
-    }
-
     @Override
-    public Department saveDepartment(DepartmentDto departmentDto) {
-        Optional<Department> optionalDepartment = getByName(departmentDto.getName());
-        Department existingDepartment = optionalDepartment.orElseGet(Department::new); // create a new department if not found
+    public void saveDepartment(DepartmentDto departmentDto) {
+        Department department;
 
-        // Only set properties if it's a new department
-        if (optionalDepartment.isEmpty()) {
-            existingDepartment.setName(departmentDto.getName());
-            existingDepartment.setCode(departmentDto.getCode());
-            return departmentRepository.save(existingDepartment);
+        if (departmentDto.getId() != null) {
+            Optional<Department> existingDepartmentOpt = departmentRepository.findById(departmentDto.getId());
+            if (existingDepartmentOpt.isPresent()) {
+                department = existingDepartmentOpt.get();
+                department.setName(departmentDto.getName());
+                department.setCode(departmentDto.getCode());
+            } else {
+                throw new NoSuchElementException("Department not found with ID: " + departmentDto.getId());
+            }
+        } else {
+            department = new Department();
+            department.setName(departmentDto.getName());
+            department.setCode(departmentDto.getCode());
         }
 
-        return existingDepartment;
+        Department savedDepartment = departmentRepository.save(department);
+
+        mapToDto(savedDepartment);
+    }
+
+    private void mapToDto(Department department) {
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setId(department.getId());
+        departmentDto.setName(department.getName());
+        departmentDto.setCode(department.getCode());
     }
 
     @Override
-    public List<DepartmentDto> filterDepartment(String filter) {
-        return toListOfDepartmentDto(departmentRepository.filter(filter));
+    public List<DepartmentDto> filterDepartment(FilterDto filter) {
+        return toListOfDepartmentDto(departmentRepository.filter(filter.getName()));
     }
 
     @Override
