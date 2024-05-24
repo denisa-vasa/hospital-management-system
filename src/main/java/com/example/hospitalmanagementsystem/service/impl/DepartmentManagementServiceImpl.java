@@ -2,6 +2,7 @@ package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
+import com.example.hospitalmanagementsystem.dto.StringDto;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.repository.DepartmentRepository;
@@ -45,9 +46,9 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
             department.setCode(departmentDto.getCode());
         }
 
-        Department savedDepartment = departmentRepository.save(department);
+        departmentRepository.save(department);
 
-        mapToDto(savedDepartment);
+        //mapToDto(savedDepartment);
     }
 
     private void mapToDto(Department department) {
@@ -64,8 +65,8 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
 
     @Override
     @Transactional
-    public void deleteDepartment(String name) {
-        departmentRepository.deleteByName(name);
+    public void deleteDepartment(StringDto stringDto) {
+        departmentRepository.deleteByName(stringDto.getName());
     }
 
     @Override
