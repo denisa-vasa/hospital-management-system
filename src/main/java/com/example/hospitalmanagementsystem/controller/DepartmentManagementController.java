@@ -2,9 +2,12 @@ package com.example.hospitalmanagementsystem.controller;
 
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
+import com.example.hospitalmanagementsystem.dto.StringDto;
 import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,24 +22,26 @@ public class DepartmentManagementController {
     private DepartmentManagementService departmentManagementService;
 
     @PostMapping("/saveDepartment")
-    public String saveDepartment(@RequestBody DepartmentDto departmentDto) {
+    public ResponseEntity<String> saveDepartment(@RequestBody DepartmentDto departmentDto) {
         departmentManagementService.saveDepartment(departmentDto);
-        return "Department saved or updated successfully!";
+        return ResponseEntity.ok("Department saved or updated successfully!");
     }
 
-    @GetMapping("/filterDepartment")
-    public List<DepartmentDto> filterDepartment(@RequestBody FilterDto filter) {
-        return departmentManagementService.filterDepartment(filter);
+    @PostMapping("/filterDepartment")
+    public ResponseEntity<List<DepartmentDto>> filterDepartment(@RequestBody FilterDto filter) {
+        List<DepartmentDto> list = departmentManagementService.filterDepartment(filter);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteDepartment")
-    public String deleteDepartment(@RequestBody FilterDto filterDto) {
-        departmentManagementService.deleteDepartment(filterDto.getName());
-        return "Department deleted successfully!";
+    public ResponseEntity<String>  deleteDepartment(@RequestBody StringDto stringDto) {
+        departmentManagementService.deleteDepartment(stringDto);
+        return ResponseEntity.ok("Department deleted successfully!");
     }
 
     @GetMapping("/getAllDepartments")
-    public List<DepartmentDto> getAllDepartments() {
-        return departmentManagementService.getAllDepartments();
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        List<DepartmentDto> list = departmentManagementService.getAllDepartments();
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }

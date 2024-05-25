@@ -47,8 +47,6 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
         }
 
         departmentRepository.save(department);
-
-        //mapToDto(savedDepartment);
     }
 
     private void mapToDto(Department department) {
