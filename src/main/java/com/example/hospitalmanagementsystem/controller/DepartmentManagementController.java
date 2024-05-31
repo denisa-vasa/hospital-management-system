@@ -6,7 +6,9 @@ import com.example.hospitalmanagementsystem.dto.StringDto;
 import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,9 +36,14 @@ public class DepartmentManagementController {
     }
 
     @DeleteMapping("/deleteDepartment")
-    public ResponseEntity<String>  deleteDepartment(@RequestBody StringDto stringDto) {
+
+    public ResponseEntity<String> deleteDepartment(@RequestBody StringDto stringDto) {
         departmentManagementService.deleteDepartment(stringDto);
-        return ResponseEntity.ok("Department deleted successfully!");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON); // Set the content type to JSON
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body("{\"message\": \"Department deleted successfully!\"}");
     }
 
     @GetMapping("/getAllDepartments")
