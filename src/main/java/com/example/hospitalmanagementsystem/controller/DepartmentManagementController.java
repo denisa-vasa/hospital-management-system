@@ -36,7 +36,6 @@ public class DepartmentManagementController {
     }
 
     @DeleteMapping("/deleteDepartment")
-
     public ResponseEntity<String> deleteDepartment(@RequestBody StringDto stringDto) {
         departmentManagementService.deleteDepartment(stringDto);
         HttpHeaders headers = new HttpHeaders();

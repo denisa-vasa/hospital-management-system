@@ -3,6 +3,7 @@ package com.example.hospitalmanagementsystem.service.impl;
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
 import com.example.hospitalmanagementsystem.dto.StringDto;
+import com.example.hospitalmanagementsystem.exception.BadRequestException;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.repository.DepartmentRepository;
@@ -38,7 +39,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
                 department.setName(departmentDto.getName());
                 department.setCode(departmentDto.getCode());
             } else {
-                throw new NotFoundException("Department not found with ID: " + departmentDto.getId());
+                throw new NotFoundException("Department with ID: " + departmentDto.getId() + " not found!");
             }
         } else {
             department = new Department();
@@ -64,6 +65,9 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     @Override
     @Transactional
     public void deleteDepartment(StringDto stringDto) {
+        if (stringDto.getName().isEmpty()) {
+            throw new BadRequestException("Department name is empty!");
+        }
         departmentRepository.deleteByName(stringDto.getName());
     }
 

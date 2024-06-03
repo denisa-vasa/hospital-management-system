@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface DepartmentManagementService {
 
-    public void saveDepartment(DepartmentDto departmentDto);
+    void saveDepartment(DepartmentDto departmentDto);
 
     List<DepartmentDto> filterDepartment(FilterDto filter);
 
-    public void deleteDepartment(StringDto stringDto);
+    void deleteDepartment(StringDto stringDto);
 
     List<DepartmentDto> getAllDepartments();
 }
