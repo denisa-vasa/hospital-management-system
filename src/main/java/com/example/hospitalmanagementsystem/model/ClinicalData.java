@@ -1,9 +1,7 @@
 package com.example.hospitalmanagementsystem.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,5 +25,6 @@ public class ClinicalData {
 
     @ManyToOne
     private AdmissionState admissionState;
+
 }
 

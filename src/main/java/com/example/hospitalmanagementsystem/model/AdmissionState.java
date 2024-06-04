@@ -1,9 +1,7 @@
 package com.example.hospitalmanagementsystem.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,5 +40,6 @@ public class AdmissionState {
 
     @OneToMany(mappedBy = "admissionState")
     private List<ClinicalData> clinicalDataList;
+
 }
 

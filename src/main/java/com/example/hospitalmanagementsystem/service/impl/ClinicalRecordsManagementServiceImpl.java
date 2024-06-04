@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -52,5 +54,16 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
         clinicalData.setAdmissionState(admissionStateManagementService.findById(clinicalDataDto.getAdmissionStateId()));
 
         clinicalDataRepository.save(clinicalData);
+    }
+
+    @Override
+    public List<ClinicalDataDto> filterClinicalRecord(ClinicalDataDto clinicalDataDto) {
+        return toListOfClinicalDataDto(clinicalDataRepository.filter(clinicalDataDto.getClinicalRecord()));
+    }
+
+    public List<ClinicalDataDto> toListOfClinicalDataDto(List<ClinicalData> clinicalDataList) {
+        List<ClinicalDataDto> dtos = new ArrayList<>();
+        clinicalDataList.forEach(c -> dtos.add(new ClinicalDataDto(c)));
+        return dtos;
     }
 }
