@@ -2,13 +2,12 @@ package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
-import com.example.hospitalmanagementsystem.model.AdmissionState;
 import com.example.hospitalmanagementsystem.model.ClinicalData;
-import com.example.hospitalmanagementsystem.repository.AdmissionStateRepository;
 import com.example.hospitalmanagementsystem.repository.ClinicalDataRepository;
-import com.example.hospitalmanagementsystem.repository.DepartmentRepository;
-import com.example.hospitalmanagementsystem.repository.PatientsRepository;
+import com.example.hospitalmanagementsystem.service.AdmissionStateManagementService;
 import com.example.hospitalmanagementsystem.service.ClinicalRecordsManagementService;
+import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
+import com.example.hospitalmanagementsystem.service.PatientsManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +22,13 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     private ClinicalDataRepository clinicalDataRepository;
 
     @Autowired
-    private PatientsRepository patientsRepository;
+    private PatientsManagementService patientsManagementService;
 
     @Autowired
-    private DepartmentRepository departmentRepository;
+    private DepartmentManagementService departmentManagementService;
 
     @Autowired
-    private AdmissionStateRepository admissionStateRepository;
+    private AdmissionStateManagementService admissionStateManagementService;
 
     @Override
     public void saveClinicalRecord(ClinicalDataDto clinicalDataDto) {
@@ -48,7 +47,9 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
             clinicalData.setClinicalRecord(clinicalDataDto.getClinicalRecord());
         }
 
-        clinicalData.setPatient(patientsRepository.findById());
+        clinicalData.setPatient(patientsManagementService.findById(clinicalDataDto.getPatientId()));
+        clinicalData.setDepartment(departmentManagementService.findById(clinicalDataDto.getDepartmentId()));
+        clinicalData.setAdmissionState(admissionStateManagementService.findById(clinicalDataDto.getAdmissionStateId()));
 
         clinicalDataRepository.save(clinicalData);
     }
