@@ -22,6 +22,13 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
     @Autowired
     private PatientsRepository patientsRepository;
 
+
+    @Override
+    public Patient findById(Long id) {
+        return patientsRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Patient with id " + id + "not found"));
+    }
+
     @Override
     public void savePatient(PatientDto patientDto) {
         Patient patient;
