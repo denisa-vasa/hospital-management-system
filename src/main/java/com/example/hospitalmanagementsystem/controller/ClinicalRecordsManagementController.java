@@ -2,10 +2,13 @@ package com.example.hospitalmanagementsystem.controller;
 
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
+import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.service.ClinicalRecordsManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +33,15 @@ public class ClinicalRecordsManagementController {
     public ResponseEntity<List<ClinicalDataDto>> filterClinicalRecord(@RequestBody ClinicalDataDto clinicalDataDto) {
         List<ClinicalDataDto> list = clinicalRecordsManagementService.filterClinicalRecord(clinicalDataDto);
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteClinicalRecord")
+    public ResponseEntity<String> deleteClinicalRecord(@RequestBody LongDto longDto) {
+        clinicalRecordsManagementService.deleteClinicalRecord(longDto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON); // Set the content type to JSON
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body("{\"message\": \"Clinical Record deleted successfully!\"}");
     }
 }

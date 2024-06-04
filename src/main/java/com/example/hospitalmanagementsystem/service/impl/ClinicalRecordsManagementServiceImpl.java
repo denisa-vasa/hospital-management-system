@@ -1,6 +1,7 @@
 package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
+import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.ClinicalData;
 import com.example.hospitalmanagementsystem.repository.ClinicalDataRepository;
@@ -32,6 +33,11 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     @Autowired
     private AdmissionStateManagementService admissionStateManagementService;
 
+    public void findById(Long id) {
+        clinicalDataRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Clinical Record with id " + id + " not found!"));
+    }
+
     @Override
     public void saveClinicalRecord(ClinicalDataDto clinicalDataDto) {
         ClinicalData clinicalData;
@@ -59,6 +65,12 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     @Override
     public List<ClinicalDataDto> filterClinicalRecord(ClinicalDataDto clinicalDataDto) {
         return toListOfClinicalDataDto(clinicalDataRepository.filter(clinicalDataDto.getClinicalRecord()));
+    }
+
+    @Override
+    public void deleteClinicalRecord(LongDto longDto) {
+        findById(longDto.getId());
+        clinicalDataRepository.deleteById(longDto.getId());
     }
 
     public List<ClinicalDataDto> toListOfClinicalDataDto(List<ClinicalData> clinicalDataList) {
