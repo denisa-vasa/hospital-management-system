@@ -11,4 +11,6 @@ public interface ClinicalRecordsManagementService {
     List<ClinicalDataDto> filterClinicalRecord(ClinicalDataDto clinicalDataDto);
 
     void deleteClinicalRecord(LongDto longDto);
+
+    List<ClinicalDataDto> getAllClinicalRecords();
 }

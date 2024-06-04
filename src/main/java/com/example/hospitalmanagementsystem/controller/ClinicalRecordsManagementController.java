@@ -44,4 +44,10 @@ public class ClinicalRecordsManagementController {
                 .headers(headers)
                 .body("{\"message\": \"Clinical Record deleted successfully!\"}");
     }
+
+    @GetMapping("/getAllClinicalRecords")
+    public ResponseEntity<List<ClinicalDataDto>> getAllClinicalRecords() {
+        List<ClinicalDataDto> list = clinicalRecordsManagementService.getAllClinicalRecords();
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
 }

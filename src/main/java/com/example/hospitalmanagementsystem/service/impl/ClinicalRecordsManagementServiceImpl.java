@@ -73,6 +73,12 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
         clinicalDataRepository.deleteById(longDto.getId());
     }
 
+    @Override
+    public List<ClinicalDataDto> getAllClinicalRecords() {
+        List<ClinicalData> clinicalDataList = clinicalDataRepository.findAll();
+        return toListOfClinicalDataDto(clinicalDataList);
+    }
+
     public List<ClinicalDataDto> toListOfClinicalDataDto(List<ClinicalData> clinicalDataList) {
         List<ClinicalDataDto> dtos = new ArrayList<>();
         clinicalDataList.forEach(c -> dtos.add(new ClinicalDataDto(c)));
