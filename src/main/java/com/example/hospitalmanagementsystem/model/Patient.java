@@ -30,5 +30,10 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient")
     private List<ClinicalData> clinicalDataList;
+
+    public Patient(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
 

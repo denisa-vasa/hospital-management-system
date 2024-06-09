@@ -1,8 +1,8 @@
 package com.example.hospitalmanagementsystem.controller;
 
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
-import com.example.hospitalmanagementsystem.dto.FilterDto;
 import com.example.hospitalmanagementsystem.dto.LongDto;
+import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.service.ClinicalRecordsManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,12 @@ public class ClinicalRecordsManagementController {
     @GetMapping("/getAllClinicalRecords")
     public ResponseEntity<List<ClinicalDataDto>> getAllClinicalRecords() {
         List<ClinicalDataDto> list = clinicalRecordsManagementService.getAllClinicalRecords();
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/getClinicalRecordsByPatientName")
+    public ResponseEntity<List<ClinicalDataDto>> getClinicalRecordsByPatientName(@RequestBody PatientDto patientDto) {
+        List<ClinicalDataDto> list = clinicalRecordsManagementService.getClinicalRecordsByPatientName(patientDto);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }

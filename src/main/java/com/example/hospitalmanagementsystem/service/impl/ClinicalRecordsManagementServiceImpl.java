@@ -2,8 +2,10 @@ package com.example.hospitalmanagementsystem.service.impl;
 
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
 import com.example.hospitalmanagementsystem.dto.LongDto;
+import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.ClinicalData;
+import com.example.hospitalmanagementsystem.model.Patient;
 import com.example.hospitalmanagementsystem.repository.ClinicalDataRepository;
 import com.example.hospitalmanagementsystem.service.AdmissionStateManagementService;
 import com.example.hospitalmanagementsystem.service.ClinicalRecordsManagementService;
@@ -76,6 +78,12 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     @Override
     public List<ClinicalDataDto> getAllClinicalRecords() {
         List<ClinicalData> clinicalDataList = clinicalDataRepository.findAll();
+        return toListOfClinicalDataDto(clinicalDataList);
+    }
+
+    @Override
+    public List<ClinicalDataDto> getClinicalRecordsByPatientName(PatientDto patientDto) {
+        List<ClinicalData> clinicalDataList = clinicalDataRepository.findByPatientFirstNameAndPatientLastName(patientDto.getFirstName(), patientDto.getLastName());
         return toListOfClinicalDataDto(clinicalDataList);
     }
 
