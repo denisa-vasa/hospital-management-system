@@ -51,7 +51,7 @@ public class ClinicalRecordsManagementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/getClinicalRecordsByPatientName")
+    @PostMapping("/getClinicalRecordsByPatientName")
     public ResponseEntity<List<ClinicalDataDto>> getClinicalRecordsByPatientName(@RequestBody PatientDto patientDto) {
         List<ClinicalDataDto> list = clinicalRecordsManagementService.getClinicalRecordsByPatientName(patientDto);
         return new ResponseEntity<>(list, HttpStatus.OK);
