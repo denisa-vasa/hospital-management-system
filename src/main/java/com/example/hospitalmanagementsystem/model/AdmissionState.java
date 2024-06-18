@@ -42,4 +42,3 @@ public class AdmissionState {
     private List<ClinicalData> clinicalDataList;
 
 }
-
