@@ -1,5 +1,6 @@
 package com.example.hospitalmanagementsystem.service;
 
+import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.model.Patient;
 
@@ -15,4 +16,6 @@ public interface PatientsManagementService {
     void deletePatient(PatientDto patientDto);
 
     List<PatientDto> getAllPatients();
+
+    PatientDto getPatientDtoById(LongDto longDto);
 }

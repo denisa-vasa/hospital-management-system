@@ -5,7 +5,6 @@ import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.ClinicalData;
-import com.example.hospitalmanagementsystem.model.Patient;
 import com.example.hospitalmanagementsystem.repository.ClinicalDataRepository;
 import com.example.hospitalmanagementsystem.service.AdmissionStateManagementService;
 import com.example.hospitalmanagementsystem.service.ClinicalRecordsManagementService;
@@ -14,6 +13,7 @@ import com.example.hospitalmanagementsystem.service.PatientsManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,16 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
                 .orElseThrow(() -> new NotFoundException("Clinical Record with id " + id + " not found!"));
     }
 
+    @Transactional
     @Override
     public void saveClinicalRecord(ClinicalDataDto clinicalDataDto) {
+        // Fetch patient details including departmentId and admissionStateId
+        PatientDto patientDto = patientsManagementService.getPatientDtoById(new LongDto(clinicalDataDto.getPatientId()));
+
+        if (patientDto == null) {
+            throw new NotFoundException("Patient with id " + clinicalDataDto.getPatientId() + " not found");
+        }
+
         ClinicalData clinicalData;
 
         if (clinicalDataDto.getId() != null) {

@@ -17,6 +17,8 @@ public class PatientDto {
     private String lastName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
+    private Long departmentId;
+    private Long admissionStateId;
 
     public PatientDto(Patient p) {
         id = p.getId();
@@ -24,5 +26,4 @@ public class PatientDto {
         lastName = p.getLastName();
         birthDate = p.getBirthDate();
     }
-
 }

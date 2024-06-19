@@ -31,7 +31,7 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
     @Override
     public Department findById(Long id) {
         return departmentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Department with id " + " not found!"));
+                .orElseThrow(() -> new NotFoundException("Department with id " + id + " not found!"));
     }
 
     @Override

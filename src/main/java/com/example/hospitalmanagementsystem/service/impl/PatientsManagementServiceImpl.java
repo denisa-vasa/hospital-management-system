@@ -1,8 +1,11 @@
 package com.example.hospitalmanagementsystem.service.impl;
 
+import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.exception.BadRequestException;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
+import com.example.hospitalmanagementsystem.model.AdmissionState;
+import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.model.Patient;
 import com.example.hospitalmanagementsystem.repository.PatientsRepository;
 import com.example.hospitalmanagementsystem.service.PatientsManagementService;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +75,37 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
     public List<PatientDto> getAllPatients() {
         List<Patient> patientList = patientsRepository.findAll();
         return toListOfPatientsDto(patientList);
+    }
+
+    @Override
+    public PatientDto getPatientDtoById(LongDto longDto) {
+        Patient patient = patientsRepository.findById(longDto.getId())
+                .orElseThrow(() -> new NotFoundException("Patient not found"));
+
+        AdmissionState latestAdmissionState = patient.getAdmissionStateList().stream()
+                .max(Comparator.comparing(AdmissionState::getEnteringDate))
+                .orElse(null);
+
+        Long departmentId = null;
+        Long admissionStateId = null;
+
+        if (latestAdmissionState != null) {
+            admissionStateId = latestAdmissionState.getId();
+            // Assuming AdmissionState has a reference to Department
+            Department department = latestAdmissionState.getDepartment();
+            if (department != null) {
+                departmentId = department.getId();
+            }
+        }
+
+        return new PatientDto(
+                patient.getId(),
+                patient.getFirstName(),
+                patient.getLastName(),
+                patient.getBirthDate(),
+                departmentId,
+                admissionStateId
+        );
     }
 
     private List<PatientDto> toListOfPatientsDto(List<Patient> patients) {

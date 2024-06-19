@@ -1,5 +1,6 @@
 package com.example.hospitalmanagementsystem.controller;
 
+import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.service.PatientsManagementService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,5 +48,11 @@ public class PatientsManagementController {
     public ResponseEntity<List<PatientDto>> getAllPatients() {
         List<PatientDto> list = patientsManagementService.getAllPatients();
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping("/getPatientById")
+    public ResponseEntity<PatientDto> getPatientById(@RequestBody LongDto longDto) {
+        PatientDto patientDto = patientsManagementService.getPatientDtoById(longDto);
+        return new ResponseEntity<>(patientDto, HttpStatus.OK);
     }
 }
