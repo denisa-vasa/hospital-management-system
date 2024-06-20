@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +31,17 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
 
     @Override
     public Department findById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Department ID cannot be null");
+        }
         return departmentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Department with id " + id + " not found!"));
     }
 
     @Override
     public void saveDepartment(DepartmentDto departmentDto) {
+        validateDepartmentDto(departmentDto);
+
         Department department;
 
         if (departmentDto.getId() != null) {
@@ -65,14 +71,17 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
 
     @Override
     public List<DepartmentDto> filterDepartment(FilterDto filter) {
+        if (filter == null || !StringUtils.hasText(filter.getName())) {
+            throw new BadRequestException("Filter criteria cannot be null or empty");
+        }
         return toListOfDepartmentDto(departmentRepository.filter(filter.getName()));
     }
 
     @Override
     @Transactional
     public void deleteDepartment(StringDto stringDto) {
-        if (stringDto.getName().isEmpty()) {
-            throw new BadRequestException("Department name is empty!");
+        if (stringDto == null || !StringUtils.hasText(stringDto.getName())) {
+            throw new BadRequestException("Department name cannot be null or empty!");
         }
         departmentRepository.deleteByName(stringDto.getName());
     }
@@ -87,5 +96,19 @@ public class DepartmentManagementServiceImpl implements DepartmentManagementServ
        List<DepartmentDto> dtos = new ArrayList<>();
        departmentList.forEach(d -> dtos.add(new DepartmentDto(d)));
        return dtos;
+    }
+
+    private void validateDepartmentDto(DepartmentDto departmentDto) {
+        if (departmentDto == null) {
+            throw new BadRequestException("DepartmentDto cannot be null");
+        }
+
+        if (!StringUtils.hasText(departmentDto.getName())) {
+            throw new BadRequestException("Department name cannot be empty");
+        }
+
+        if (!StringUtils.hasText(departmentDto.getCode())) {
+            throw new BadRequestException("Department code cannot be empty");
+        }
     }
 }

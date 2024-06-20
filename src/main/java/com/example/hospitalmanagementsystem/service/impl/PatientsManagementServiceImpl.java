@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,12 +30,18 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
 
     @Override
     public Patient findById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Patient ID cannot be null");
+        }
+
         return patientsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Patient with id " + id + "not found"));
     }
 
     @Override
     public void savePatient(PatientDto patientDto) {
+        validatePatientDto(patientDto);
+
         Patient patient;
 
         if (patientDto.getId() != null) {
@@ -59,13 +66,16 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
 
     @Override
     public List<PatientDto> filterPatients(PatientDto patientDto) {
+        if (patientDto == null) {
+            throw new BadRequestException("Filter criteria cannot be null");
+        }
         return toListOfPatientsDto(patientsRepository.filter(patientDto.getFirstName(), patientDto.getLastName()));
     }
 
     @Override
     @Transactional
     public void deletePatient(PatientDto patientDto) {
-        if (patientDto.getFirstName().isEmpty() || patientDto.getLastName().isEmpty()) {
+        if (patientDto == null || !StringUtils.hasText(patientDto.getFirstName()) || !StringUtils.hasText(patientDto.getLastName())) {
             throw new BadRequestException("Patient's name or lastname is empty!");
         }
         patientsRepository.deleteByFirstNameAndLastName(patientDto.getFirstName(), patientDto.getLastName());
@@ -79,6 +89,10 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
 
     @Override
     public PatientDto getPatientDtoById(LongDto longDto) {
+        if (longDto == null || longDto.getId() == null) {
+            throw new BadRequestException("ID cannot be null");
+        }
+
         Patient patient = patientsRepository.findById(longDto.getId())
                 .orElseThrow(() -> new NotFoundException("Patient not found"));
 
@@ -112,5 +126,23 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
         List<PatientDto> dtos = new ArrayList<>();
         patients.forEach(p -> dtos.add(new PatientDto(p)));
         return dtos;
+    }
+
+    private void validatePatientDto(PatientDto patientDto) {
+        if (patientDto == null) {
+            throw new BadRequestException("PatientDto cannot be null");
+        }
+
+        if (!StringUtils.hasText(patientDto.getFirstName())) {
+            throw new BadRequestException("Patient's first name cannot be empty");
+        }
+
+        if (!StringUtils.hasText(patientDto.getLastName())) {
+            throw new BadRequestException("Patient's last name cannot be empty");
+        }
+
+        if (patientDto.getBirthDate() == null) {
+            throw new BadRequestException("Patient's birth date cannot be null");
+        }
     }
 }

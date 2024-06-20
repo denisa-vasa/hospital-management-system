@@ -3,6 +3,7 @@ package com.example.hospitalmanagementsystem.service.impl;
 import com.example.hospitalmanagementsystem.dto.ClinicalDataDto;
 import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
+import com.example.hospitalmanagementsystem.exception.BadRequestException;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.ClinicalData;
 import com.example.hospitalmanagementsystem.repository.ClinicalDataRepository;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,9 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     private AdmissionStateManagementService admissionStateManagementService;
 
     public void findById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("Clinical Record ID cannot be null");
+        }
         clinicalDataRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Clinical Record with id " + id + " not found!"));
     }
@@ -43,6 +48,7 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     @Transactional
     @Override
     public void saveClinicalRecord(ClinicalDataDto clinicalDataDto) {
+        validateClinicalDataDto(clinicalDataDto);
         // Fetch patient details including departmentId and admissionStateId
         PatientDto patientDto = patientsManagementService.getPatientDtoById(new LongDto(clinicalDataDto.getPatientId()));
 
@@ -74,11 +80,18 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
 
     @Override
     public List<ClinicalDataDto> filterClinicalRecord(ClinicalDataDto clinicalDataDto) {
+        if (clinicalDataDto == null || !StringUtils.hasText(clinicalDataDto.getClinicalRecord())) {
+            throw new BadRequestException("Filter criteria cannot be null or empty");
+        }
         return toListOfClinicalDataDto(clinicalDataRepository.filter(clinicalDataDto.getClinicalRecord()));
     }
 
     @Override
     public void deleteClinicalRecord(LongDto longDto) {
+        if (longDto == null || longDto.getId() == null) {
+            throw new BadRequestException("ID cannot be null");
+        }
+
         findById(longDto.getId());
         clinicalDataRepository.deleteById(longDto.getId());
     }
@@ -91,6 +104,9 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
 
     @Override
     public List<ClinicalDataDto> getClinicalRecordsByPatientName(PatientDto patientDto) {
+        if (patientDto == null || !StringUtils.hasText(patientDto.getFirstName()) || !StringUtils.hasText(patientDto.getLastName())) {
+            throw new BadRequestException("Patient's first name or last name cannot be null or empty");
+        }
         List<ClinicalData> clinicalDataList = clinicalDataRepository.findByPatientFirstNameAndPatientLastName(patientDto.getFirstName(), patientDto.getLastName());
         return toListOfClinicalDataDto(clinicalDataList);
     }
@@ -99,5 +115,27 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
         List<ClinicalDataDto> dtos = new ArrayList<>();
         clinicalDataList.forEach(c -> dtos.add(new ClinicalDataDto(c)));
         return dtos;
+    }
+
+    private void validateClinicalDataDto(ClinicalDataDto clinicalDataDto) {
+        if (clinicalDataDto == null) {
+            throw new BadRequestException("ClinicalDataDto cannot be null");
+        }
+
+        if (clinicalDataDto.getPatientId() == null) {
+            throw new BadRequestException("Patient ID cannot be null");
+        }
+
+        if (clinicalDataDto.getDepartmentId() == null) {
+            throw new BadRequestException("Department ID cannot be null");
+        }
+
+        if (clinicalDataDto.getAdmissionStateId() == null) {
+            throw new BadRequestException("Admission State ID cannot be null");
+        }
+
+        if (!StringUtils.hasText(clinicalDataDto.getClinicalRecord())) {
+            throw new BadRequestException("Clinical record cannot be empty");
+        }
     }
 }
