@@ -1,36 +1,30 @@
-package com.example.hospitalmanagementsystem.service.impl;
+package com.example.hospitalmanagementsystem.service.stub;
 
 import com.example.hospitalmanagementsystem.dto.LongDto;
 import com.example.hospitalmanagementsystem.dto.PatientDto;
 import com.example.hospitalmanagementsystem.exception.BadRequestException;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
-import com.example.hospitalmanagementsystem.model.AdmissionState;
-import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.model.Patient;
-import com.example.hospitalmanagementsystem.repository.PatientsRepository;
 import com.example.hospitalmanagementsystem.service.PatientsManagementService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@Slf4j
-public class PatientsManagementServiceImpl implements PatientsManagementService {
+public class PatientsManagementServiceStub implements PatientsManagementService {
 
-    @Autowired
-    private PatientsRepository patientsRepository;
+    private List<Patient> patients = new ArrayList<>();
+    private Long nextId = 1L;
 
-    public PatientsManagementServiceImpl(PatientsRepository patientsRepository) {
-        this.patientsRepository = patientsRepository;
+    public PatientsManagementServiceStub() {
+        // Add patients for testing
+        Patient patient1 = new Patient();
+        patient1.setId(1L);
+        patient1.setFirstName("John");
+        patient1.setLastName("Doe");
+        patients.add(patient1);
     }
-
 
     @Override
     public Patient findById(Long id) {
@@ -38,8 +32,10 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
             throw new BadRequestException("Patient ID cannot be null");
         }
 
-        return patientsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Patient with id " + id + "not found"));
+        return patients.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Patient with id " + id + " not found"));
     }
 
     @Override
@@ -49,23 +45,25 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
         Patient patient;
 
         if (patientDto.getId() != null) {
-            Optional<Patient> existingPatientOpt = patientsRepository.findById(patientDto.getId());
+            Optional<Patient> existingPatientOpt = patients.stream()
+                    .filter(p -> p.getId().equals(patientDto.getId()))
+                    .findFirst();
             if (existingPatientOpt.isPresent()) {
                 patient = existingPatientOpt.get();
                 patient.setFirstName(patientDto.getFirstName());
                 patient.setLastName(patientDto.getLastName());
                 patient.setBirthDate(patientDto.getBirthDate());
             } else {
-                throw new NotFoundException("Patient with id " + patientDto.getId() + "not found");
+                throw new NotFoundException("Patient with id " + patientDto.getId() + " not found");
             }
         } else {
             patient = new Patient();
+            patient.setId(nextId++);
             patient.setFirstName(patientDto.getFirstName());
             patient.setLastName(patientDto.getLastName());
             patient.setBirthDate(patientDto.getBirthDate());
+            patients.add(patient);
         }
-
-        patientsRepository.save(patient);
     }
 
     @Override
@@ -73,22 +71,31 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
         if (patientDto == null) {
             throw new BadRequestException("Filter criteria cannot be null");
         }
-        return toListOfPatientsDto(patientsRepository.filter(patientDto.getFirstName(), patientDto.getLastName()));
+        List<PatientDto> result = new ArrayList<>();
+        for (Patient patient : patients) {
+            if ((patientDto.getFirstName() == null || patient.getFirstName().equals(patientDto.getFirstName())) &&
+                    (patientDto.getLastName() == null || patient.getLastName().equals(patientDto.getLastName()))) {
+                result.add(new PatientDto(patient));
+            }
+        }
+        return result;
     }
 
     @Override
-    @Transactional
     public void deletePatient(PatientDto patientDto) {
         if (patientDto == null || !StringUtils.hasText(patientDto.getFirstName()) || !StringUtils.hasText(patientDto.getLastName())) {
             throw new BadRequestException("Patient's name or lastname is empty!");
         }
-        patientsRepository.deleteByFirstNameAndLastName(patientDto.getFirstName(), patientDto.getLastName());
+        patients.removeIf(p -> p.getFirstName().equals(patientDto.getFirstName()) && p.getLastName().equals(patientDto.getLastName()));
     }
 
     @Override
     public List<PatientDto> getAllPatients() {
-        List<Patient> patientList = patientsRepository.findAll();
-        return toListOfPatientsDto(patientList);
+        List<PatientDto> result = new ArrayList<>();
+        for (Patient patient : patients) {
+            result.add(new PatientDto(patient));
+        }
+        return result;
     }
 
     @Override
@@ -97,39 +104,20 @@ public class PatientsManagementServiceImpl implements PatientsManagementService 
             throw new BadRequestException("ID cannot be null");
         }
 
-        Patient patient = patientsRepository.findById(longDto.getId())
+        Patient patient = patients.stream()
+                .filter(p -> p.getId().equals(longDto.getId()))
+                .findFirst()
                 .orElseThrow(() -> new NotFoundException("Patient not found"));
 
-        AdmissionState latestAdmissionState = patient.getAdmissionStateList().stream()
-                .max(Comparator.comparing(AdmissionState::getEnteringDate))
-                .orElse(null);
-
-        Long departmentId = null;
-        Long admissionStateId = null;
-
-        if (latestAdmissionState != null) {
-            admissionStateId = latestAdmissionState.getId();
-            // Assuming AdmissionState has a reference to Department
-            Department department = latestAdmissionState.getDepartment();
-            if (department != null) {
-                departmentId = department.getId();
-            }
-        }
-
+        // For simplicity, assuming no admission state and department handling
         return new PatientDto(
                 patient.getId(),
                 patient.getFirstName(),
                 patient.getLastName(),
                 patient.getBirthDate(),
-                departmentId,
-                admissionStateId
+                null,
+                null
         );
-    }
-
-    private List<PatientDto> toListOfPatientsDto(List<Patient> patients) {
-        List<PatientDto> dtos = new ArrayList<>();
-        patients.forEach(p -> dtos.add(new PatientDto(p)));
-        return dtos;
     }
 
     private void validatePatientDto(PatientDto patientDto) {

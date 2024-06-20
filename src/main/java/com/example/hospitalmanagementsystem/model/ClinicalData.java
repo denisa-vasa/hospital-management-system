@@ -26,5 +26,13 @@ public class ClinicalData {
     @ManyToOne
     private AdmissionState admissionState;
 
+    public ClinicalData(long l, long l1, long l2, String filterText) {
+
+    }
+
+    public ClinicalData(long l, String anotherClinicalRecord) {
+        id = l;
+        clinicalRecord = anotherClinicalRecord;
+    }
 }
 

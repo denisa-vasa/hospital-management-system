@@ -37,6 +37,20 @@ public class ClinicalRecordsManagementServiceImpl implements ClinicalRecordsMana
     @Autowired
     private AdmissionStateManagementService admissionStateManagementService;
 
+    /*public ClinicalRecordsManagementServiceImpl(ClinicalDataRepository clinicalDataRepository) {
+        this.clinicalDataRepository = clinicalDataRepository;
+    }*/
+
+    public ClinicalRecordsManagementServiceImpl(ClinicalDataRepository clinicalDataRepository,
+                                                PatientsManagementService patientsManagementService,
+                                                DepartmentManagementService departmentManagementService,
+                                                AdmissionStateManagementService admissionStateManagementService) {
+        this.clinicalDataRepository = clinicalDataRepository;
+        this.patientsManagementService = patientsManagementService;
+        this.departmentManagementService = departmentManagementService;
+        this.admissionStateManagementService = admissionStateManagementService;
+    }
+
     public void findById(Long id) {
         if (id == null) {
             throw new BadRequestException("Clinical Record ID cannot be null");

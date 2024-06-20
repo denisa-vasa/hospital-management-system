@@ -27,4 +27,10 @@ public class Department {
 
     @OneToMany(mappedBy = "department")
     private List<ClinicalData> clinicalDataList;
+
+    public Department(long l, String cardiology, String card) {
+        id = l;
+        name = cardiology;
+        code = card;
+    }
 }

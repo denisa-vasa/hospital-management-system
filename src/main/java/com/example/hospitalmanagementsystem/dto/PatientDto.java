@@ -26,4 +26,11 @@ public class PatientDto {
         lastName = p.getLastName();
         birthDate = p.getBirthDate();
     }
+
+    public PatientDto(Long patientId, String alice, String smith, LocalDate of) {
+        id = patientId;
+        firstName = alice;
+        lastName = smith;
+        birthDate = of;
+    }
 }

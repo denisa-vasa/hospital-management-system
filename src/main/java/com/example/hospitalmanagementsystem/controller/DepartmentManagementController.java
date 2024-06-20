@@ -3,6 +3,7 @@ package com.example.hospitalmanagementsystem.controller;
 import com.example.hospitalmanagementsystem.dto.DepartmentDto;
 import com.example.hospitalmanagementsystem.dto.FilterDto;
 import com.example.hospitalmanagementsystem.dto.StringDto;
+import com.example.hospitalmanagementsystem.model.Department;
 import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

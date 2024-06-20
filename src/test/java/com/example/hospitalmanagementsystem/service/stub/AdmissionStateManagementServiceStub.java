@@ -1,39 +1,27 @@
-package com.example.hospitalmanagementsystem.service.impl;
+package com.example.hospitalmanagementsystem.service.stub;
 
 import com.example.hospitalmanagementsystem.dto.AdmissionStateDto;
 import com.example.hospitalmanagementsystem.dto.DischargeReasonDto;
 import com.example.hospitalmanagementsystem.exception.BadRequestException;
 import com.example.hospitalmanagementsystem.exception.NotFoundException;
 import com.example.hospitalmanagementsystem.model.AdmissionState;
-import com.example.hospitalmanagementsystem.repository.AdmissionStateRepository;
 import com.example.hospitalmanagementsystem.service.AdmissionStateManagementService;
-import com.example.hospitalmanagementsystem.service.DepartmentManagementService;
-import com.example.hospitalmanagementsystem.service.PatientsManagementService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-@Service
-@Slf4j
-public class AdmissionStateManagementServiceImpl implements AdmissionStateManagementService {
+public class AdmissionStateManagementServiceStub implements AdmissionStateManagementService {
 
-    @Autowired
-    private AdmissionStateRepository admissionStateRepository;
+    private List<AdmissionState> admissionStates = new ArrayList<>();
+    private Long nextId = 1L;
 
-    @Autowired
-    private DepartmentManagementService departmentManagementService;
-
-    @Autowired
-    private PatientsManagementService patientsManagementService;
-
-    public AdmissionStateManagementServiceImpl(AdmissionStateRepository admissionStateRepository,
-                                               DepartmentManagementService departmentManagementService,
-                                               PatientsManagementService patientsManagementService) {
-        this.admissionStateRepository = admissionStateRepository;
-        this.departmentManagementService = departmentManagementService;
-        this.patientsManagementService = patientsManagementService;
+    public AdmissionStateManagementServiceStub() {
+        // Add admission states for testing
+        AdmissionState admissionState1 = new AdmissionState();
+        admissionState1.setId(1L);
+        admissionState1.setCause("Test Cause");
+        admissionState1.setDischarge(false);
+        admissionStates.add(admissionState1);
     }
 
     @Override
@@ -41,7 +29,10 @@ public class AdmissionStateManagementServiceImpl implements AdmissionStateManage
         if (id == null) {
             throw new BadRequestException("Admission State ID cannot be null");
         }
-        return admissionStateRepository.findById(id)
+
+        return admissionStates.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
                 .orElseThrow(() -> new NotFoundException("Admission state with id " + id + " not found!"));
     }
 
@@ -59,42 +50,30 @@ public class AdmissionStateManagementServiceImpl implements AdmissionStateManage
             throw new BadRequestException("Discharge reason cannot be null or empty");
         }
 
-        Optional<AdmissionState> optionalAdmissionState = admissionStateRepository.findById(dischargeReasonDto.getId());
-        if (optionalAdmissionState.isPresent()) {
-            AdmissionState admissionState = optionalAdmissionState.get();
-            admissionState.setReason(dischargeReasonDto.getReason());
-            admissionState.setDischarge(true);
-            admissionStateRepository.save(admissionState);
-        } else {
-            throw new NotFoundException("AdmissionState not found with id: " + dischargeReasonDto.getId());
-        }
+        AdmissionState admissionState = findById(dischargeReasonDto.getId());
+        admissionState.setReason(dischargeReasonDto.getReason());
+        admissionState.setDischarge(true);
     }
 
     @Override
     public void saveCause(AdmissionStateDto admissionStateDto) {
         validateAdmissionStateDto(admissionStateDto);
-        
+
         AdmissionState admissionState;
 
         if (admissionStateDto.getId() != null) {
-            Optional<AdmissionState> existingAdmissionState = admissionStateRepository.findById(admissionStateDto.getId());
-            if (existingAdmissionState.isPresent()) {
-                admissionState = existingAdmissionState.get();
-            } else {
-                throw new NotFoundException("Admission State with id " + admissionStateDto.getId() + " not found");
-            }
+            admissionState = findById(admissionStateDto.getId());
         } else {
             admissionState = new AdmissionState();
+            admissionState.setId(nextId++);
+            admissionStates.add(admissionState);
         }
+
         admissionState.setCause(admissionStateDto.getCause());
         admissionState.setDischarge(admissionStateDto.isDischarge());
         admissionState.setEnteringDate(admissionStateDto.getEnteringDate());
         admissionState.setExitingDate(admissionStateDto.getExitingDate());
         admissionState.setReason(admissionStateDto.getReason());
-        admissionState.setDepartment(departmentManagementService.findById(admissionStateDto.getDepartmentId()));
-        admissionState.setPatient(patientsManagementService.findById(admissionStateDto.getPatientId()));
-
-        admissionStateRepository.save(admissionState);
     }
 
     private void validateAdmissionStateDto(AdmissionStateDto admissionStateDto) {

@@ -35,5 +35,18 @@ public class Patient {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
+    public Patient(Long patientId, String existing, String patient, LocalDate of) {
+        id = patientId;
+        firstName = existing;
+        lastName = patient;
+        birthDate = of;
+    }
+
+    public Patient(long l, String patient6, String patient61) {
+        id = l;
+        firstName = patient6;
+        lastName = patient61;
+    }
 }
 
